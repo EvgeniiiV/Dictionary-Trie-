@@ -3,17 +3,11 @@ using namespace std;
 #include "Dictionary.h"
 #include <string>
 
-
-
 Dictionary::Dictionary()
-{
-    suggestion = new string[SIZE];
+{    
     root = getNode();      
 }
-Dictionary::~Dictionary()
-{
-    delete[]suggestion;
-}
+
 Dictionary::TrieNode* Dictionary::getNode(void)
 {
     TrieNode* pNode = new TrieNode;
@@ -26,7 +20,7 @@ Dictionary::TrieNode* Dictionary::getNode(void)
 }
     // If not present, inserts key into trie.  If the
 // key is prefix of trie node, just marks leaf node
-    void Dictionary::insert(/*TrieNode* root,*/ const string key)
+    void Dictionary::insert(const string key)
     {
         struct TrieNode* pCrawl = root;
 
@@ -105,7 +99,7 @@ Dictionary::TrieNode* Dictionary::getNode(void)
     }
 
     // print suggestions for given query prefix.
-    int Dictionary::printAutoSuggestions(/*TrieNode* root, */const string query)
+    int Dictionary::printAutoSuggestions(const string query)
     {
         TrieNode* pCrawl = root;
 
@@ -152,14 +146,15 @@ Dictionary::TrieNode* Dictionary::getNode(void)
             return 1;
         }
     }
+    //collects suggestions to choose
     void Dictionary::addsuggestions(string currPrefix, int index)
     {        
         if (index == SIZE)
-        { cout << "Error: Out of memory" << endl;
-        delete[] suggestion;
+        { cout << "Error: Out of memory" << endl;        
         exit(0); }
         suggestion[index] = currPrefix; 
     }
+    //prints chosen suggestion 
     void Dictionary::print(int index)
     {
         cout << suggestion[index] << endl;
@@ -172,8 +167,9 @@ Dictionary::TrieNode* Dictionary::getNode(void)
         d.insert("hello");
         d.insert("dog");
         d.insert("hell");
-        d.insert("cat");
-        d.insert("a");
+        d.insert("doggy");
+        d.insert("dogs");
+        d.insert("dogma");
         d.insert("hel");
         d.insert("help");
         d.insert("helps");
