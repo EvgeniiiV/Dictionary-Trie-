@@ -1,8 +1,6 @@
-//https://www.geeksforgeeks.org/auto-complete-feature-using-trie/
+// based on https://www.geeksforgeeks.org/auto-complete-feature-using-trie/
 #pragma once
 #include <iostream>
-#include< stdlib.h >
-#include <cassert>
 using namespace std;
 #define SIZE 20 //maximum of suggestions
 #define ALPHABET_SIZE (26)
@@ -13,13 +11,10 @@ class Dictionary
 public:
     struct TrieNode
     {
-        struct TrieNode* children[ALPHABET_SIZE];
-        // isWordEnd is true if the node represents
-        // end of a word
+        TrieNode* children[ALPHABET_SIZE];       
         bool isWordEnd;
     };
-    Dictionary();
-    ~Dictionary();
+    Dictionary();   
     struct TrieNode* getNode(void);
     void insert(const string key);
     bool search(TrieNode* root, const string key);
@@ -31,5 +26,5 @@ public:
     
 private:
     TrieNode* root;   
-    string *suggestion;
+    string suggestion [SIZE];
 };
