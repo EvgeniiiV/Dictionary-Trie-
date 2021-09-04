@@ -1,4 +1,3 @@
-// based on https://www.geeksforgeeks.org/auto-complete-feature-using-trie/
 #pragma once
 #include <iostream>
 using namespace std;
@@ -16,10 +15,10 @@ public:
     };
     Dictionary();   
     struct TrieNode* getNode(void);
-    void insert(const string key);
-    bool search(TrieNode* root, const string key);
+    void insert(const string key);    
+    TrieNode* search(const string key);
     bool isLastNode(struct TrieNode* root);
-    void suggestionsRec(TrieNode* root, string currPrefix, int& counter);
+    void suggestionsRec(TrieNode* root, string currPrefix, int& counter);    
     int printAutoSuggestions(const string query);
     void addsuggestions(string currPrefix, int index);
     void print(int index);
@@ -27,4 +26,5 @@ public:
 private:
     TrieNode* root;   
     string suggestion [SIZE];
+    TrieNode* vizited[SIZE];
 };
