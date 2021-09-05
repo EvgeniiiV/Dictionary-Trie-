@@ -26,5 +26,5 @@ public:
 private:
     TrieNode* root;   
     string suggestion [SIZE];
-    TrieNode* vizited[SIZE];
+   
 };
