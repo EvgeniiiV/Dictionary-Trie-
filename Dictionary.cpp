@@ -12,7 +12,7 @@ Dictionary::TrieNode* Dictionary::getNode(void)
 {
     TrieNode* pNode = new TrieNode;
     pNode->isWordEnd = false;
-
+    TrieNode* parent = nullptr;
     for (int i = 0; i < ALPHABET_SIZE; i++)
         pNode->children[i] = NULL;
 
@@ -21,17 +21,14 @@ Dictionary::TrieNode* Dictionary::getNode(void)
     void Dictionary::insert(const string key)
     {
         struct TrieNode* pCrawl = root;
-
         for (int level = 0; level < key.length(); level++)
         {
             int index = CHAR_TO_INDEX(key[level]);
             if (!pCrawl->children[index])
                 pCrawl->children[index] = getNode();
-
+            pCrawl->children[index]->parent = pCrawl;
             pCrawl = pCrawl->children[index];
-        }
-
-        
+        }        
         pCrawl->isWordEnd = true;
     }
     
@@ -51,7 +48,7 @@ Dictionary::TrieNode* Dictionary::getNode(void)
     }
     // Returns 0 if current node has a child
     // If all children are NULL, return 1.
-    bool Dictionary::isLastNode(struct TrieNode* root)
+    bool Dictionary::isLastNode(TrieNode* root)
     {
         for (int i = 0; i < ALPHABET_SIZE; i++)
             if (root->children[i])
@@ -59,38 +56,111 @@ Dictionary::TrieNode* Dictionary::getNode(void)
         return 1;
     }
 
-    // Recursive function to print auto-suggestions for given
-// node.
-    void Dictionary::suggestionsRec(TrieNode* root, string currPrefix, int& counter)
+    int Dictionary::suffixCount(TrieNode* root)
     {
-        // found a string in Trie with the given prefix
-        if (root->isWordEnd)
-        {
-           cout << counter << " " << currPrefix << endl;            
-           addsuggestions(currPrefix, counter);
-           counter++;
-        }
+        int result = 0;
 
-        // All children struct node pointers are NULL
-        if (isLastNode(root))
-            return;
+        // Leaf denotes end of a word
+        if (root->isWordEnd)
+            result++;
 
         for (int i = 0; i < ALPHABET_SIZE; i++)
-        {
             if (root->children[i])
-            {
-                // append current character to currPrefix string
-                currPrefix.push_back(97 + i);
+                result += suffixCount(root->children[i]);
 
-                // recur over the rest
-                suggestionsRec(root->children[i], currPrefix, counter);
-                // remove last character
+        return result;
+    }
+    //pseudo-iterative traversal of the trie under the prefix
+    void Dictionary::suggestionsRec(TrieNode* current, string currPrefix, int& counter)
+    {
+        int numOfSuffixes = suffixCount(current);
+        int upDown = 1;//for switch
+        int next_index = 0; //starting index to find  next letter      
+        if (current->isWordEnd)
+        {
+            cout << counter << " " << currPrefix << endl;
+            addsuggestions(currPrefix, counter);
+            counter++;
+        }
+
+        while (counter < numOfSuffixes)
+        {
+            switch (upDown)
+            {
+              case 1:
+                if (counter == numOfSuffixes)
+                    return;                
+                   
+               
+                if(!isLastNode(current))//not a leaf
+                for (int i = 0; i < ALPHABET_SIZE; i++)
+                {
+                    if  (current && current->children[i])
+                    {
+                        currPrefix.push_back(97 + i);
+                        current = current->children[i];
+                        i = 0;
+                        if (current->isWordEnd)
+                        {
+                            cout << counter << " " << currPrefix << endl;
+                            addsuggestions(currPrefix, counter);
+                            counter++;
+                        }
+                        if (isLastNode(current)) break;  
+                                  
+                           
+                        
+                    }
+                }
+
+                upDown = 2;
+                break;
+
+             case 2:
+                
+                current = current->parent;
+                next_index = (currPrefix[currPrefix.size() - 1] - 97) + 1;//next letter
                 currPrefix.pop_back();
+                
+                for (next_index; next_index < 26; next_index++)//start with next letter
+                {
+                    if (current->children[next_index])
+                    {                        
+                        current = current->children[next_index];
+                       
+                        upDown = 3;
+                        break;
+                    }
+                }
+                
+                break;
+
+             case 3:                       
+                 
+                     currPrefix.push_back(97 + next_index);//take letter
+                     if (isLastNode(current) && current->isWordEnd)//if leaf    
+
+                     {
+                         cout << counter << " " << currPrefix << endl;
+                         addsuggestions(currPrefix, counter);
+                         counter++;
+                         upDown = 2;
+                     }
+                     else if (current->isWordEnd)
+                     {
+                         cout << counter << " " << currPrefix << endl;
+                         addsuggestions(currPrefix, counter);
+                         counter++;
+                         upDown = 1;
+                     }
+                     else upDown = 1;
+                     break;           
+                                
+            
             }
         }
-    }   
-      
-
+    }         
+    
     // print suggestions for given query prefix.
     int Dictionary::printAutoSuggestions(const string query)
     {
@@ -150,7 +220,8 @@ Dictionary::TrieNode* Dictionary::getNode(void)
         d.insert("dogma");
         d.insert("hel");
         d.insert("help");
-        d.insert("helps");
+        d.insert("helmet");        
+        d.insert("helper");
         d.insert("helping");
 
         while (true)
